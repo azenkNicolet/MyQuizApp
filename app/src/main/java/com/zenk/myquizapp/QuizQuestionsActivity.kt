@@ -4,12 +4,12 @@ import android.graphics.Color
 import android.graphics.Typeface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 
 class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
@@ -56,6 +56,8 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun setQuestion() {
+
+        defaultOptionsView()
 
         val question: Question = mQuestionsList!![mCurrentPosition - 1]
         ivImage?.setImageResource(question.image)
@@ -149,9 +151,72 @@ class QuizQuestionsActivity : AppCompatActivity(), View.OnClickListener {
             }
 
             R.id.btn_submit -> {
-                //TODO Set up btn_submit.
+                if(mSelectedOptionPosition == 0)
+                {
+                    mCurrentPosition++
+
+                    when
+                    {
+                        mCurrentPosition <= mQuestionsList!!.size -> {
+                            setQuestion()
+                        }
+
+                        else -> {
+                            Toast.makeText(this, "You made it to the end", Toast.LENGTH_SHORT)
+                        }
+                    }
+
+                }
+                else
+                {
+                    val question = mQuestionsList?.get(mCurrentPosition - 1)
+
+                    if(question!!.correctAnswer != mSelectedOptionPosition)
+                    {
+                        //If wrong answer is selected, highlight it by setting background to red.
+                        answerView(mSelectedOptionPosition, R.drawable.wrong_option_border_bg)
+                    }
+
+                    //Correct option always gets green background.
+                    answerView(question.correctAnswer, R.drawable.correct_option_border_bg)
+
+                    //Go to next question
+                    if(mCurrentPosition == mQuestionsList!!.size)
+                    {
+                        btnSubmit?.text = "FINISH"
+                    }
+                    else
+                    {
+                        btnSubmit?.text = "GO TO NEXT QUESTION"
+                    }
+
+                    //Reset selected answer to unselected(0).
+                    mSelectedOptionPosition = 0
+
+                }
             }
         }
+    }
 
+    private fun answerView(answer: Int, drawableView: Int)
+    {
+        when(answer)
+        {
+            1 -> {
+                tvOptionOne?.background = ContextCompat.getDrawable(this, drawableView)
+            }
+
+            2 -> {
+                tvOptionTwo?.background = ContextCompat.getDrawable(this, drawableView)
+            }
+
+            3 -> {
+                tvOptionThree?.background = ContextCompat.getDrawable(this, drawableView)
+            }
+
+            4 -> {
+                tvOptionFour?.background = ContextCompat.getDrawable(this, drawableView)
+            }
+        }
     }
 }
